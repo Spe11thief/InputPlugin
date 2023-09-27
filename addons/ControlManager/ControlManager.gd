@@ -1,6 +1,7 @@
 @tool
 extends EditorPlugin
 
+#test commit
 
 func _enter_tree():
 	# Initialization of the plugin goes here.
