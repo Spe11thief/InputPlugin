@@ -1,0 +1,102 @@
+{
+	"categories": [
+		{
+			"uuid": "6c174045-0e39-4605-89e6-ef9b6a922015",
+			"title": "Task",
+			"color": "70bafa"
+		}
+	],
+	"stages": [
+		{
+			"uuid": "169fba29-2cbc-46ad-b4a6-11b95270b2c5",
+			"title": "Todo",
+			"tasks": [
+				"eafbf31f-3f5d-4f7c-a078-b90bca195e32"
+			]
+		},
+		{
+			"uuid": "887b2189-fc49-4c1a-bd11-7c9eb62eeb1c",
+			"title": "Doing",
+			"tasks": [
+				"6b8cba9a-39ec-4b6b-adfc-3eaa76a46bf3"
+			]
+		},
+		{
+			"uuid": "8694295f-f88a-4e66-b604-271e96852cf7",
+			"title": "Done",
+			"tasks": [
+				"6c447c10-4428-4187-bf4b-046c3622c8be"
+			]
+		}
+	],
+	"tasks": [
+		{
+			"uuid": "6b8cba9a-39ec-4b6b-adfc-3eaa76a46bf3",
+			"title": "Create Action Resource",
+			"description": "Holds all possible inputs seperated by type. Need to setup local enums for all input options :/",
+			"category": "6c174045-0e39-4605-89e6-ef9b6a922015",
+			"steps": [
+				{
+					"details": "Define Input Type Arrays",
+					"done": true
+				},
+				{
+					"details": "Create Keyboard Enum",
+					"done": true
+				},
+				{
+					"details": "Create Button Enum",
+					"done": true
+				},
+				{
+					"details": "Create Axii Enum",
+					"done": false
+				}
+			]
+		},
+		{
+			"uuid": "6c447c10-4428-4187-bf4b-046c3622c8be",
+			"title": "Create Map Resource",
+			"description": "Holds and array of Actions",
+			"category": "6c174045-0e39-4605-89e6-ef9b6a922015",
+			"steps": []
+		},
+		{
+			"uuid": "eafbf31f-3f5d-4f7c-a078-b90bca195e32",
+			"title": "Write Control Manager",
+			"description": "",
+			"category": "6c174045-0e39-4605-89e6-ef9b6a922015",
+			"steps": [
+				{
+					"details": "Take in ActionList and produce InputMaps",
+					"done": false
+				},
+				{
+					"details": "Number of Controllers",
+					"done": false
+				},
+				{
+					"details": "Buffer Length",
+					"done": false
+				},
+				{
+					"details": "Deadzone",
+					"done": false
+				}
+			]
+		}
+	],
+	"layout": {
+		"columns": [
+			[
+				"169fba29-2cbc-46ad-b4a6-11b95270b2c5"
+			],
+			[
+				"887b2189-fc49-4c1a-bd11-7c9eb62eeb1c"
+			],
+			[
+				"8694295f-f88a-4e66-b604-271e96852cf7"
+			]
+		]
+	}
+}
