@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="Map" load_steps=8 format=3 uid="uid://cmcflgkwcoxd4"]
+
+[ext_resource type="Script" path="res://addons/ControlManager/Resources/Axis.gd" id="1_pugmd"]
+[ext_resource type="Script" path="res://addons/ControlManager/Resources/Action.gd" id="2_1sdb4"]
+[ext_resource type="Script" path="res://addons/ControlManager/Resources/Map.gd" id="3_x6ees"]
+
+[sub_resource type="Resource" id="Resource_ni241"]
+script = ExtResource("1_pugmd")
+axis = 0
+direction = 0
+deadzone = 0.0
+
+[sub_resource type="Resource" id="Resource_dnaxs"]
+script = ExtResource("2_1sdb4")
+name = "Left"
+keys = Array[int]([4194319, 65])
+mouse_buttons = Array[int]([])
+joy_buttons = Array[int]([13])
+axii = Array[ExtResource("1_pugmd")]([SubResource("Resource_ni241")])
+
+[sub_resource type="Resource" id="Resource_e0wu8"]
+script = ExtResource("1_pugmd")
+axis = 0
+direction = 1
+deadzone = 0.0
+
+[sub_resource type="Resource" id="Resource_1elai"]
+script = ExtResource("2_1sdb4")
+name = "Right"
+keys = Array[int]([4194321, 68])
+mouse_buttons = Array[int]([])
+joy_buttons = Array[int]([14])
+axii = Array[ExtResource("1_pugmd")]([SubResource("Resource_e0wu8")])
+
+[resource]
+script = ExtResource("3_x6ees")
+actions = Array[ExtResource("2_1sdb4")]([SubResource("Resource_dnaxs"), SubResource("Resource_1elai")])

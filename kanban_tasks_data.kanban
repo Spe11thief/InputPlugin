@@ -73,15 +73,15 @@
 				},
 				{
 					"details": "Number of Controllers",
-					"done": false
+					"done": true
 				},
 				{
 					"details": "Buffer Length",
-					"done": false
+					"done": true
 				},
 				{
 					"details": "Deadzone",
-					"done": false
+					"done": true
 				}
 			]
 		}
