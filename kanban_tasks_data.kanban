@@ -14,7 +14,8 @@
 				"eba0236d-ad13-4403-959d-15bfcae50cc3",
 				"8eaf0f6a-a30a-4aee-929b-00eac7a0194b",
 				"402ab9ab-60dd-4eb5-97c7-aa63bbc75a56",
-				"1bf34c80-7594-432e-a05b-bc5f4de29401"
+				"1bf34c80-7594-432e-a05b-bc5f4de29401",
+				"35bd4dd9-498a-4e11-86c7-9e211d80136c"
 			]
 		},
 		{
@@ -194,6 +195,13 @@
 		{
 			"uuid": "1bf34c80-7594-432e-a05b-bc5f4de29401",
 			"title": "Remap saving and loading",
+			"description": "",
+			"category": "6c174045-0e39-4605-89e6-ef9b6a922015",
+			"steps": []
+		},
+		{
+			"uuid": "35bd4dd9-498a-4e11-86c7-9e211d80136c",
+			"title": "Test Task",
 			"description": "",
 			"category": "6c174045-0e39-4605-89e6-ef9b6a922015",
 			"steps": []
