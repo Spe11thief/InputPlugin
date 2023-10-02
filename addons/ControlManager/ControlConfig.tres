@@ -1,10 +1,10 @@
 [gd_resource type="Resource" script_class="ControlManagerConfiguaration" load_steps=3 format=3 uid="uid://dt7vcor06bp1f"]
 
+[ext_resource type="Resource" uid="uid://cmcflgkwcoxd4" path="res://addons/ControlManager/Map.tres" id="1_duqsx"]
 [ext_resource type="Script" path="res://addons/ControlManager/Resources/ManagerConfig.gd" id="1_ftplr"]
-[ext_resource type="Resource" uid="uid://cmcflgkwcoxd4" path="res://addons/ControlManager/Map.tres" id="1_jdn60"]
 
 [resource]
 script = ExtResource("1_ftplr")
 buffer = 100
-default_controller_map = ExtResource("1_jdn60")
-controller_count = 4
+default_control_map = ExtResource("1_duqsx")
+device_count = 4

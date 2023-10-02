@@ -2,5 +2,5 @@ extends Resource
 class_name ControlManagerConfiguaration
 
 @export var buffer := 100
-@export var default_controller_map : Map
-@export var controller_count := 4
+@export var default_control_map : Map
+@export var device_count := 4

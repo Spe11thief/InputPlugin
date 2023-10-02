@@ -11,21 +11,26 @@
 			"uuid": "169fba29-2cbc-46ad-b4a6-11b95270b2c5",
 			"title": "Todo",
 			"tasks": [
-				"eafbf31f-3f5d-4f7c-a078-b90bca195e32"
+				"eba0236d-ad13-4403-959d-15bfcae50cc3",
+				"8eaf0f6a-a30a-4aee-929b-00eac7a0194b",
+				"402ab9ab-60dd-4eb5-97c7-aa63bbc75a56",
+				"1bf34c80-7594-432e-a05b-bc5f4de29401"
 			]
 		},
 		{
 			"uuid": "887b2189-fc49-4c1a-bd11-7c9eb62eeb1c",
 			"title": "Doing",
 			"tasks": [
-				"6b8cba9a-39ec-4b6b-adfc-3eaa76a46bf3"
+				"eafbf31f-3f5d-4f7c-a078-b90bca195e32"
 			]
 		},
 		{
 			"uuid": "8694295f-f88a-4e66-b604-271e96852cf7",
 			"title": "Done",
 			"tasks": [
-				"6c447c10-4428-4187-bf4b-046c3622c8be"
+				"6c447c10-4428-4187-bf4b-046c3622c8be",
+				"6b8cba9a-39ec-4b6b-adfc-3eaa76a46bf3",
+				"426b9a0b-de92-4fc6-bef3-ece887f30cd4"
 			]
 		}
 	],
@@ -50,7 +55,7 @@
 				},
 				{
 					"details": "Create Axii Enum",
-					"done": false
+					"done": true
 				}
 			]
 		},
@@ -69,7 +74,7 @@
 			"steps": [
 				{
 					"details": "Take in ActionList and produce InputMaps",
-					"done": false
+					"done": true
 				},
 				{
 					"details": "Number of Controllers",
@@ -82,8 +87,116 @@
 				{
 					"details": "Deadzone",
 					"done": true
+				},
+				{
+					"details": "complete buffer",
+					"done": false
+				},
+				{
+					"details": "controller based input map selection",
+					"done": true
+				},
+				{
+					"details": "record_input_buffer",
+					"done": false
+				},
+				{
+					"details": "is_action_just_pressed",
+					"done": false
+				},
+				{
+					"details": "is_action_pressed",
+					"done": false
+				},
+				{
+					"details": "is_action_just_released",
+					"done": false
+				},
+				{
+					"details": "is_action_just_flicked",
+					"done": false
+				},
+				{
+					"details": "get_action_strength",
+					"done": false
+				},
+				{
+					"details": "get_action_raw_strength",
+					"done": false
+				},
+				{
+					"details": "get_vector",
+					"done": false
+				},
+				{
+					"details": "get_axis",
+					"done": false
+				},
+				{
+					"details": "action_has_event",
+					"done": false
+				},
+				{
+					"details": "get_event_actions",
+					"done": false
+				},
+				{
+					"details": "get_event_device",
+					"done": false
 				}
 			]
+		},
+		{
+			"uuid": "eba0236d-ad13-4403-959d-15bfcae50cc3",
+			"title": "Add support for Map switching",
+			"description": "",
+			"category": "6c174045-0e39-4605-89e6-ef9b6a922015",
+			"steps": [
+				{
+					"details": "init new action's buffer",
+					"done": false
+				},
+				{
+					"details": "update device's map in control_maps array",
+					"done": false
+				},
+				{
+					"details": "remove old device godot InputActions",
+					"done": false
+				},
+				{
+					"details": "Create new Godot InputActions",
+					"done": false
+				}
+			]
+		},
+		{
+			"uuid": "426b9a0b-de92-4fc6-bef3-ece887f30cd4",
+			"title": "Create Axis Resource",
+			"description": "",
+			"category": "6c174045-0e39-4605-89e6-ef9b6a922015",
+			"steps": []
+		},
+		{
+			"uuid": "8eaf0f6a-a30a-4aee-929b-00eac7a0194b",
+			"title": "Make editor window",
+			"description": "",
+			"category": "6c174045-0e39-4605-89e6-ef9b6a922015",
+			"steps": []
+		},
+		{
+			"uuid": "402ab9ab-60dd-4eb5-97c7-aa63bbc75a56",
+			"title": "Add remapping support",
+			"description": "",
+			"category": "6c174045-0e39-4605-89e6-ef9b6a922015",
+			"steps": []
+		},
+		{
+			"uuid": "1bf34c80-7594-432e-a05b-bc5f4de29401",
+			"title": "Remap saving and loading",
+			"description": "",
+			"category": "6c174045-0e39-4605-89e6-ef9b6a922015",
+			"steps": []
 		}
 	],
 	"layout": {
