@@ -14,8 +14,7 @@
 				"eba0236d-ad13-4403-959d-15bfcae50cc3",
 				"8eaf0f6a-a30a-4aee-929b-00eac7a0194b",
 				"402ab9ab-60dd-4eb5-97c7-aa63bbc75a56",
-				"1bf34c80-7594-432e-a05b-bc5f4de29401",
-				"35bd4dd9-498a-4e11-86c7-9e211d80136c"
+				"1bf34c80-7594-432e-a05b-bc5f4de29401"
 			]
 		},
 		{
@@ -135,7 +134,7 @@
 				},
 				{
 					"details": "action_has_event",
-					"done": false
+					"done": true
 				},
 				{
 					"details": "get_event_actions",

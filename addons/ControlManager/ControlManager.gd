@@ -101,43 +101,43 @@ func get_action_by_name(name: String, control_code: int = -1):
 		push_error("Action " + name + " does not exist in current control maps") 
 	return null
 
-func action_has_event(action_name: String, event: InputEvent, control_code: int = -1, control_map: Map = null):
-	#Left off here. Okay sooo... Basically we're going to need to iterate through all of the actions on all controllers. Then have a case where if the controller is specified, it only checks that.
-	#currently we're just starting to go through all controllers regardless of case. We can probably drop control_map because that should be derived from the controller.
-	#current controller maps should be held in an array with the index matching the control_code
-	var map = control_map
-	if control_map == null:
-		map = config.default_control_map
-	for device in config.device_count + 1:
-		for action in map.actions:
-			if device == 0:
-				for i in range(action.keys.size()):
-					pass
-					
+# USED FOR ACTION_NAME_HAS_EVENT
+func input_has_event(device: int, action_name: String, input_type: INPUT_TYPE, index: int, event: InputEvent):
+		var input_name = build_input_name(device, action_name, INPUT_TYPE.KEY, index)
+		if InputMap.action_has_event(input_name, event):
+			return true
+		else:
+			return false
 
-func action_has_eventOLD(action_name: String, event: InputEvent):
-	#REWRITE
-	#Sigh... event.device returns 0 for the first controller as well.
-	var device = event.device
-	var action: Action = get_action_by_name(action_name)
-	if device == 0:
-		for i in range(action.keys.size()):
-			var godot_action_name = build_input_name(device, action.name, INPUT_TYPE.KEY, i)
-			if InputMap.action_has_event(godot_action_name, event):
-				return true
-		for i in range(action.mouse_buttons.size()):
-			var godot_action_name = build_input_name(device, action.name, INPUT_TYPE.MOUSE_BUTTON, i)
-			if InputMap.action_has_event(godot_action_name, event):
+# USED FOR ACTION_NAME_HAS_EVENT
+func map_has_event(map: Map, device: int, action_name: String, event: InputEvent):
+	for action in map.actions:
+		if device == 0:
+			for i in range(action.keys.size()):
+				if input_has_event(device, action_name, INPUT_TYPE.KEY, i, event):
+					return true
+			for i in range(action.mouse_buttons.size()):
+				if input_has_event(device, action_name, INPUT_TYPE.MOUSE_BUTTON, i, event):
+					return true
+		else:
+			for i in range(action.joy_buttons.size()):
+				if input_has_event(device, action_name, INPUT_TYPE.JOY_BUTTON, i, event):
+					return true
+			for i in range(action.axii.size()):
+				if input_has_event(device, action_name, INPUT_TYPE.AXIS, i, event):
+					return true
+
+# Check for input with action name
+func action_has_event(action_name: String, event: InputEvent, control_code: int = -1):
+	if !range(control_maps.size()).has(control_code):
+		for device in control_maps.size():
+			var map := control_maps[device]
+			if map_has_event(map, device, action_name, event):
 				return true
 	else:
-		for i in range(action.joy_buttons.size()):
-			var godot_action_name = build_input_name(device, action.name, INPUT_TYPE.JOY_BUTTON, i)
-			if InputMap.action_has_event(godot_action_name, event):
-				return true
-		for i in range(action.axii.size()):
-			var godot_action_name = build_input_name(device, action.name, INPUT_TYPE.AXIS, i)
-			if InputMap.action_has_event(godot_action_name, event):
-				return true
+		var map := control_maps[control_code]
+		if map_has_event(map, control_code, action_name, event):
+			return true
 	return false
 	
 func _input(event: InputEvent):
