@@ -7,8 +7,8 @@
 [sub_resource type="Resource" id="Resource_ni241"]
 script = ExtResource("1_pugmd")
 axis = 0
-direction = 0
-deadzone = 0.0
+direction = -1
+deadzone = 0.1
 
 [sub_resource type="Resource" id="Resource_dnaxs"]
 script = ExtResource("2_1sdb4")
@@ -17,12 +17,13 @@ keys = Array[int]([4194319, 65])
 mouse_buttons = Array[int]([])
 joy_buttons = Array[int]([13])
 axii = Array[ExtResource("1_pugmd")]([SubResource("Resource_ni241")])
+deadzone = 0.1
 
 [sub_resource type="Resource" id="Resource_e0wu8"]
 script = ExtResource("1_pugmd")
 axis = 0
 direction = 1
-deadzone = 0.0
+deadzone = 0.1
 
 [sub_resource type="Resource" id="Resource_1elai"]
 script = ExtResource("2_1sdb4")
@@ -31,6 +32,7 @@ keys = Array[int]([4194321, 68])
 mouse_buttons = Array[int]([])
 joy_buttons = Array[int]([14])
 axii = Array[ExtResource("1_pugmd")]([SubResource("Resource_e0wu8")])
+deadzone = 0.1
 
 [resource]
 script = ExtResource("3_x6ees")

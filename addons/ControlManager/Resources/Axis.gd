@@ -8,4 +8,3 @@ enum DIR {
 
 @export var axis : JoyAxis
 @export var direction : DIR
-@export var deadzone : float

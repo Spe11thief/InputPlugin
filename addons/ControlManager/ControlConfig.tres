@@ -7,4 +7,4 @@
 script = ExtResource("1_ftplr")
 buffer = 100
 default_control_map = ExtResource("1_duqsx")
-device_count = 4
+device_count = 8
