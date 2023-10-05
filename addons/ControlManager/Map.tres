@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="Map" load_steps=8 format=3 uid="uid://cmcflgkwcoxd4"]
+[gd_resource type="Resource" script_class="Map" load_steps=12 format=3 uid="uid://cmcflgkwcoxd4"]
 
 [ext_resource type="Script" path="res://addons/ControlManager/Resources/Axis.gd" id="1_pugmd"]
 [ext_resource type="Script" path="res://addons/ControlManager/Resources/Action.gd" id="2_1sdb4"]
@@ -8,7 +8,6 @@
 script = ExtResource("1_pugmd")
 axis = 0
 direction = -1
-deadzone = 0.1
 
 [sub_resource type="Resource" id="Resource_dnaxs"]
 script = ExtResource("2_1sdb4")
@@ -23,7 +22,6 @@ deadzone = 0.1
 script = ExtResource("1_pugmd")
 axis = 0
 direction = 1
-deadzone = 0.1
 
 [sub_resource type="Resource" id="Resource_1elai"]
 script = ExtResource("2_1sdb4")
@@ -34,6 +32,34 @@ joy_buttons = Array[int]([14])
 axii = Array[ExtResource("1_pugmd")]([SubResource("Resource_e0wu8")])
 deadzone = 0.1
 
+[sub_resource type="Resource" id="Resource_l0rq8"]
+script = ExtResource("1_pugmd")
+axis = 1
+direction = -1
+
+[sub_resource type="Resource" id="Resource_oj6kv"]
+script = ExtResource("2_1sdb4")
+name = "Up"
+keys = Array[int]([4194320, 87])
+mouse_buttons = Array[int]([])
+joy_buttons = Array[int]([11])
+axii = Array[ExtResource("1_pugmd")]([SubResource("Resource_l0rq8")])
+deadzone = 0.1
+
+[sub_resource type="Resource" id="Resource_e7lyx"]
+script = ExtResource("1_pugmd")
+axis = 1
+direction = 1
+
+[sub_resource type="Resource" id="Resource_5p2ev"]
+script = ExtResource("2_1sdb4")
+name = "Down"
+keys = Array[int]([4194322, 83])
+mouse_buttons = Array[int]([])
+joy_buttons = Array[int]([12])
+axii = Array[ExtResource("1_pugmd")]([SubResource("Resource_e7lyx")])
+deadzone = 0.1
+
 [resource]
 script = ExtResource("3_x6ees")
-actions = Array[ExtResource("2_1sdb4")]([SubResource("Resource_dnaxs"), SubResource("Resource_1elai")])
+actions = Array[ExtResource("2_1sdb4")]([SubResource("Resource_dnaxs"), SubResource("Resource_1elai"), SubResource("Resource_oj6kv"), SubResource("Resource_5p2ev")])

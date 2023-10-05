@@ -91,7 +91,7 @@
 				},
 				{
 					"details": "complete buffer",
-					"done": false
+					"done": true
 				},
 				{
 					"details": "controller based input map selection",
@@ -99,7 +99,7 @@
 				},
 				{
 					"details": "record_input_buffer",
-					"done": false
+					"done": true
 				},
 				{
 					"details": "is_action_just_pressed",
@@ -127,11 +127,11 @@
 				},
 				{
 					"details": "get_vector",
-					"done": false
+					"done": true
 				},
 				{
 					"details": "get_axis",
-					"done": false
+					"done": true
 				},
 				{
 					"details": "action_has_event",
@@ -139,10 +139,14 @@
 				},
 				{
 					"details": "get_event_actions",
-					"done": false
+					"done": true
 				},
 				{
 					"details": "get_event_device",
+					"done": true
+				},
+				{
+					"details": "Fix vector deadzone?",
 					"done": false
 				}
 			]

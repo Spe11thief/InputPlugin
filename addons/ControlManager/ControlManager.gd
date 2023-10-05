@@ -78,10 +78,31 @@ func clean_input_buffer():
 		for input in buffer[control_action]:
 			if input.time + config.buffer > current_time and buffer[control_action].size() > 1:
 				buffer[control_action].erase(input)
-			
-func record_input_buffer():
-	#TODO: Make this when get raw is complete
-	pass
+	print(buffer)
+
+func build_action_buffer_name(action_name: String, control_code: int):
+	return "p" + str(control_code) + "_" + action_name
+	
+func build_event_buffer_action_names(event):
+	var action_names = []
+	for i in range(control_maps.size()):
+		var map := control_maps[i]
+		for action in map.actions:
+			if action_has_event(action.name, event):
+				action_names.append(build_action_buffer_name(action.name, i))
+	return action_names
+
+# TODO: Come back once get control_code is a thing
+func record_input_buffer(event):
+	if event.is_echo(): return
+	var action_buffer_names = build_event_buffer_action_names(event)
+	for action_name in action_buffer_names:
+		var device = action_name[1] as int
+		var action = action_name.get_slice("_",1)
+		var input_strength = Controls.get_action_raw_strength(action, device)
+		# prints(action_name, input_strength)
+		if buffer[action_name].size() > 0 and buffer[action_name][0].strength == input_strength: break
+		buffer[action_name].push_front({"strength": input_strength, "time": Time.get_ticks_msec()})
 
 func _ready():
 	init_maps()
@@ -90,6 +111,9 @@ func _ready():
 func _process(delta):
 	#Was commented out in the other game for some reason? Maybe performance issues
 	clean_input_buffer()
+	
+func _input(event):
+	record_input_buffer(event)
 	
 func get_action_by_name(name: String, control_code: int = -1) -> Action:
 	if !range(control_maps.size()).has(control_code):
@@ -351,9 +375,10 @@ func get_action_strength(action_name: String, control_code: = -1, event: InputEv
 			strength = input_strength
 	return strength
 
-func get_axis(action_pos_name: String, action_neg_name: String, deadzone: float = .1, control_code: = -1, event: InputEvent = null):
+func get_axis(action_pos_name: String, action_neg_name: String, control_code: = -1, deadzone: float = .1, event: InputEvent = null):
 	if event:
 		if !action_has_event(action_pos_name, event, control_code) && !action_has_event(action_neg_name, event, control_code):
+			printerr("neither action has event")
 			return
 	var axis: float = 0
 	if !range(control_maps.size()).has(control_code):
@@ -364,7 +389,8 @@ func get_axis(action_pos_name: String, action_neg_name: String, deadzone: float 
 			var final_deadzone = max(avg_deadzone, deadzone)
 			var pos = get_action_raw_strength(action_pos_name, device)
 			var neg = get_action_raw_strength(action_neg_name, device)
-			if abs(axis) > abs(axis) and axis > -final_deadzone and axis < final_deadzone:
+			var new_axis = pos - neg
+			if abs(new_axis) > abs(axis) and (new_axis < -final_deadzone or new_axis > final_deadzone):
 				axis = pos - neg
 	else:
 		var pos_deadzone = get_action_by_name(action_pos_name, control_code).deadzone
@@ -376,3 +402,59 @@ func get_axis(action_pos_name: String, action_neg_name: String, deadzone: float 
 		if abs(axis) > abs(axis) and axis > -final_deadzone and axis < final_deadzone:
 			axis = pos - neg
 	return axis
+
+func get_vector(action_up_name: String, action_down_name: String, action_left_name: String, action_right_name: String, control_code := -1, deadzone: float = .1, event: InputEvent = null):
+	if event:
+		if !action_has_event(action_up_name, event, control_code) && !action_has_event(action_down_name, event, control_code) && !action_has_event(action_left_name, event, control_code) && !action_has_event(action_right_name, event, control_code):
+			printerr("no action hasevent")
+			return
+	var vector: Vector2 = Vector2.ZERO
+	if !range(control_maps.size()).has(control_code):
+		for device in control_maps.size():
+			var up_deadzone = get_action_by_name(action_up_name, device).deadzone
+			var down_deadzone = get_action_by_name(action_down_name, device).deadzone
+			var left_deadzone = get_action_by_name(action_left_name, device).deadzone
+			var right_deadzone = get_action_by_name(action_right_name, device).deadzone
+			var avg_deadzone = (up_deadzone + down_deadzone + left_deadzone + right_deadzone) / 4
+			var final_deadzone = max(avg_deadzone, deadzone)
+			var real_deadzone = sqrt((final_deadzone * final_deadzone) * 2)
+			var up = get_action_raw_strength(action_up_name, device)
+			var down = get_action_raw_strength(action_down_name, device)
+			var left = get_action_raw_strength(action_left_name, device)
+			var right = get_action_raw_strength(action_right_name, device)
+			var new_vector = Vector2(right - left, down - up)
+			if vector.length_squared() < new_vector.length_squared() and new_vector.length() > real_deadzone:
+				vector = new_vector
+	else:
+		var up_deadzone = get_action_by_name(action_up_name, control_code).deadzone
+		var down_deadzone = get_action_by_name(action_down_name, control_code).deadzone
+		var left_deadzone = get_action_by_name(action_left_name, control_code).deadzone
+		var right_deadzone = get_action_by_name(action_right_name, control_code).deadzone
+		var avg_deadzone = (up_deadzone + down_deadzone + left_deadzone + right_deadzone) / 4
+		var final_deadzone = max(avg_deadzone, deadzone)
+		var real_deadzone = sqrt((final_deadzone * final_deadzone) * 2)
+		var up = get_action_raw_strength(action_up_name, control_code)
+		var down = get_action_raw_strength(action_down_name, control_code)
+		var left = get_action_raw_strength(action_left_name, control_code)
+		var right = get_action_raw_strength(action_right_name, control_code)
+		var new_vector = Vector2(right - left, down - up)
+		if vector.length_squared() < new_vector.length_squared() and new_vector.length() > real_deadzone:
+			vector = new_vector
+	return vector
+
+func get_event_action_names(event, control_code := -1):
+	var action_names = []
+	for i in range(control_maps.size()):
+		var map := control_maps[i]
+		for action in map.actions:
+			if action_has_event(action.name, event):
+				action_names.append(action.name)
+	return action_names
+
+func get_event_device(event):
+	for i in range(control_maps.size()):
+		var map := control_maps[i]
+		for action in map.actions:
+			if action_has_event(action.name, event):
+				return i
+	return -1

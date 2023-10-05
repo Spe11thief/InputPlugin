@@ -3,11 +3,17 @@ extends CharacterBody2D
 
 const SPEED = 300.0
 
-func _physics_process(delta):
+func _physics_process(_delta):
 	
-	var direction = Controls.get_action_strength("Right") - Controls.get_action_strength("Left")
-	velocity.x = direction * SPEED
-	if direction == 0:
+	var direction = Controls.get_vector("Up", "Down", "Left", "Right")
+	velocity = direction * SPEED
+	if direction == Vector2.ZERO:
 		velocity.x = move_toward(velocity.x, 0, SPEED)
+		velocity.y = move_toward(velocity.y, 0, SPEED)
+#	if Controls.is_action_pressed("Left", 0):
+#		velocity.x = SPEED
+#	else:
+#		velocity.x = move_toward(velocity.x, 0, SPEED)
+
 
 	move_and_slide()
