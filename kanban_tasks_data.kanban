@@ -115,7 +115,7 @@
 				},
 				{
 					"details": "is_action_just_flicked",
-					"done": false
+					"done": true
 				},
 				{
 					"details": "get_action_strength",

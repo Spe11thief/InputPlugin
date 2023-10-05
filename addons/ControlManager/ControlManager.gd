@@ -155,6 +155,13 @@ func map_has_event(map: Map, device: int, action_name: String, event: InputEvent
 				if input_has_event(device, action_name, INPUT_TYPE.AXIS, i, event):
 					return true
 
+func map_has_action(map: Map, action_name: String):
+	#TODO: Use this to catch checking maps for actions that don't exist.
+	for action in map.actions:
+		if action.name == action_name:
+			return true
+	return false
+
 # Check for input with action name
 func action_has_event(action_name: String, event: InputEvent, control_code: int = -1):
 	if !range(control_maps.size()).has(control_code):
@@ -458,3 +465,31 @@ func get_event_device(event):
 			if action_has_event(action.name, event):
 				return i
 	return -1
+
+func check_buffer_for_action_flick(action_name: String, deadzone := .1, flick_strength := .9, flick_window := .1, control_code := -1, event: InputEvent = null):
+	var current_strength = get_action_strength(action_name, control_code, event)
+	if abs(current_strength) < flick_strength: return false
+	var current_time = Time.get_ticks_msec()
+	var starting_time = current_time - (flick_window * 1000)
+	var buffer_name = build_action_buffer_name(action_name, control_code)
+	var strengths = []
+	var final_deadzone = max(deadzone, get_action_by_name(action_name, control_code).deadzone)
+	for buffer_frame in buffer[buffer_name]:
+		if buffer_frame.time >= starting_time and abs(buffer_frame.strength) < final_deadzone:
+			return true
+	return false
+
+func is_action_just_flicked(action_name: String, deadzone := .1, flick_strength := .9, flick_window := .1, control_code := -1, event: InputEvent = null):
+	if event:
+		if !action_has_event(action_name, event, control_code):
+			printerr("action does not have event")
+			return
+	var vector: Vector2 = Vector2.ZERO
+	if !range(control_maps.size()).has(control_code):
+		for device in control_maps.size():
+			if check_buffer_for_action_flick(action_name, deadzone, flick_strength, flick_window, device, event):
+				return true
+	else:
+		if check_buffer_for_action_flick(action_name, deadzone, flick_strength, flick_window, control_code, event):
+			return true
+	return false
