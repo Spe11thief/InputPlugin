@@ -14,6 +14,11 @@ func _physics_process(_delta):
 #		velocity.x = SPEED
 #	else:
 #		velocity.x = move_toward(velocity.x, 0, SPEED)
+	if Controls.is_action_just_flicked("Left"):
+		print("Flicked Left")
+	
+	if Controls.is_action_just_flicked("Right"):
+		print("Flicked Right")
 
 
 	move_and_slide()

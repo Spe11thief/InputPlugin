@@ -17,6 +17,8 @@ var buffer = {}
 
 var control_maps: Array[Map] = []
 
+var godot_action_key = {}
+
 func clear_godot_input_map():
 	var actions = InputMap.get_actions()
 
@@ -39,7 +41,7 @@ func init_maps():
 				for i in range(action.axii.size()):
 					commit_action_input_to_map(action, device, INPUT_TYPE.AXIS, i, action.deadzone)
 		control_maps.append(config.default_control_map.duplicate(true))
-	print(InputMap.get_actions())
+	#print(InputMap.get_actions())
 	
 func build_input_name(device: int, action_name: String, input_type: INPUT_TYPE, index: int):
 	return "p" + str(device) + "_" + action_name + "_" + input_dic[input_type] + "_" + str(index)
@@ -78,7 +80,6 @@ func clean_input_buffer():
 		for input in buffer[control_action]:
 			if input.time + config.buffer > current_time and buffer[control_action].size() > 1:
 				buffer[control_action].erase(input)
-	print(buffer)
 
 func build_action_buffer_name(action_name: String, control_code: int):
 	return "p" + str(control_code) + "_" + action_name
@@ -90,19 +91,19 @@ func build_event_buffer_action_names(event):
 		for action in map.actions:
 			if action_has_event(action.name, event):
 				action_names.append(build_action_buffer_name(action.name, i))
+	#print(action_names)
 	return action_names
 
 # TODO: Come back once get control_code is a thing
-func record_input_buffer(event):
+func record_input_buffer(event: InputEvent):
 	if event.is_echo(): return
 	var action_buffer_names = build_event_buffer_action_names(event)
 	for action_name in action_buffer_names:
 		var device = action_name[1] as int
 		var action = action_name.get_slice("_",1)
 		var input_strength = Controls.get_action_raw_strength(action, device)
-		# prints(action_name, input_strength)
 		if buffer[action_name].size() > 0 and buffer[action_name][0].strength == input_strength: break
-		buffer[action_name].push_front({"strength": input_strength, "time": Time.get_ticks_msec()})
+		buffer[action_name].push_front({"strength" = input_strength, "time" = Time.get_ticks_msec()})
 
 func _ready():
 	init_maps()
@@ -111,9 +112,11 @@ func _ready():
 func _process(delta):
 	#Was commented out in the other game for some reason? Maybe performance issues
 	clean_input_buffer()
+	pass
 	
 func _input(event):
 	record_input_buffer(event)
+	pass
 	
 func get_action_by_name(name: String, control_code: int = -1) -> Action:
 	if !range(control_maps.size()).has(control_code):
@@ -472,9 +475,9 @@ func check_buffer_for_action_flick(action_name: String, deadzone := .1, flick_st
 	var current_time = Time.get_ticks_msec()
 	var starting_time = current_time - (flick_window * 1000)
 	var buffer_name = build_action_buffer_name(action_name, control_code)
-	var strengths = []
 	var final_deadzone = max(deadzone, get_action_by_name(action_name, control_code).deadzone)
 	for buffer_frame in buffer[buffer_name]:
+		#print(buffer_frame)
 		if buffer_frame.time >= starting_time and abs(buffer_frame.strength) < final_deadzone:
 			return true
 	return false
@@ -484,7 +487,6 @@ func is_action_just_flicked(action_name: String, deadzone := .1, flick_strength 
 		if !action_has_event(action_name, event, control_code):
 			printerr("action does not have event")
 			return
-	var vector: Vector2 = Vector2.ZERO
 	if !range(control_maps.size()).has(control_code):
 		for device in control_maps.size():
 			if check_buffer_for_action_flick(action_name, deadzone, flick_strength, flick_window, device, event):
