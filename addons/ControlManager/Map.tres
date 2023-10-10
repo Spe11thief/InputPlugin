@@ -16,7 +16,7 @@ keys = Array[int]([4194319, 65])
 mouse_buttons = Array[int]([])
 joy_buttons = Array[int]([13])
 axii = Array[ExtResource("1_pugmd")]([SubResource("Resource_ni241")])
-deadzone = 0.1
+deadzone = 0.2
 
 [sub_resource type="Resource" id="Resource_e0wu8"]
 script = ExtResource("1_pugmd")
@@ -30,7 +30,7 @@ keys = Array[int]([4194321, 68])
 mouse_buttons = Array[int]([])
 joy_buttons = Array[int]([14])
 axii = Array[ExtResource("1_pugmd")]([SubResource("Resource_e0wu8")])
-deadzone = 0.1
+deadzone = 0.2
 
 [sub_resource type="Resource" id="Resource_l0rq8"]
 script = ExtResource("1_pugmd")
@@ -44,7 +44,7 @@ keys = Array[int]([4194320, 87])
 mouse_buttons = Array[int]([])
 joy_buttons = Array[int]([11])
 axii = Array[ExtResource("1_pugmd")]([SubResource("Resource_l0rq8")])
-deadzone = 0.1
+deadzone = 0.2
 
 [sub_resource type="Resource" id="Resource_e7lyx"]
 script = ExtResource("1_pugmd")
@@ -58,7 +58,7 @@ keys = Array[int]([4194322, 83])
 mouse_buttons = Array[int]([])
 joy_buttons = Array[int]([12])
 axii = Array[ExtResource("1_pugmd")]([SubResource("Resource_e7lyx")])
-deadzone = 0.1
+deadzone = 0.2
 
 [resource]
 script = ExtResource("3_x6ees")

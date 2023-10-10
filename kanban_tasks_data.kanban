@@ -14,8 +14,7 @@
 				"eba0236d-ad13-4403-959d-15bfcae50cc3",
 				"8eaf0f6a-a30a-4aee-929b-00eac7a0194b",
 				"402ab9ab-60dd-4eb5-97c7-aa63bbc75a56",
-				"1bf34c80-7594-432e-a05b-bc5f4de29401",
-				"35bd4dd9-498a-4e11-86c7-9e211d80136c"
+				"1bf34c80-7594-432e-a05b-bc5f4de29401"
 			]
 		},
 		{
@@ -31,7 +30,8 @@
 			"tasks": [
 				"6c447c10-4428-4187-bf4b-046c3622c8be",
 				"6b8cba9a-39ec-4b6b-adfc-3eaa76a46bf3",
-				"426b9a0b-de92-4fc6-bef3-ece887f30cd4"
+				"426b9a0b-de92-4fc6-bef3-ece887f30cd4",
+				"64c2d9d3-db96-46a9-b3d9-4602e3bd7328"
 			]
 		}
 	],
@@ -90,16 +90,12 @@
 					"done": true
 				},
 				{
-					"details": "complete buffer",
-					"done": true
-				},
-				{
 					"details": "controller based input map selection",
 					"done": true
 				},
 				{
 					"details": "record_input_buffer",
-					"done": true
+					"done": false
 				},
 				{
 					"details": "is_action_just_pressed",
@@ -147,6 +143,10 @@
 				},
 				{
 					"details": "Fix vector deadzone?",
+					"done": false
+				},
+				{
+					"details": "clear_buffer",
 					"done": false
 				}
 			]
@@ -206,6 +206,13 @@
 		{
 			"uuid": "35bd4dd9-498a-4e11-86c7-9e211d80136c",
 			"title": "Test Task",
+			"description": "",
+			"category": "6c174045-0e39-4605-89e6-ef9b6a922015",
+			"steps": []
+		},
+		{
+			"uuid": "64c2d9d3-db96-46a9-b3d9-4602e3bd7328",
+			"title": "Set default Deadzone to .2",
 			"description": "",
 			"category": "6c174045-0e39-4605-89e6-ef9b6a922015",
 			"steps": []
