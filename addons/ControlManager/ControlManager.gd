@@ -17,7 +17,7 @@ var buffer = {}
 
 var control_maps: Array[Map] = []
 
-var godot_action_key = {}
+var action_key = {}
 
 func clear_godot_input_map():
 	var actions = InputMap.get_actions()
@@ -41,7 +41,7 @@ func init_maps():
 				for i in range(action.axii.size()):
 					commit_action_input_to_map(action, device, INPUT_TYPE.AXIS, i, action.deadzone)
 		control_maps.append(config.default_control_map.duplicate(true))
-	#print(InputMap.get_actions())
+	print(action_key)
 	
 func build_input_name(device: int, action_name: String, input_type: INPUT_TYPE, index: int):
 	return "p" + str(device) + "_" + action_name + "_" + input_dic[input_type] + "_" + str(index)
@@ -51,6 +51,7 @@ func commit_action_input_to_map(action: Action, device: int, input_type: INPUT_T
 	if InputMap.has_action(input_name):
 		InputMap.erase_action(input_name)
 	InputMap.add_action(input_name, deadzone)
+	
 	# Build and commit event
 	var ev
 	match input_type:
@@ -68,6 +69,15 @@ func commit_action_input_to_map(action: Action, device: int, input_type: INPUT_T
 			ev.axis = action.axii[input_index].axis
 			ev.axis_value = action.axii[input_index].direction
 	InputMap.action_add_event(input_name, ev)
+	
+	#Add built action_name to action_key
+	if action_key.has(action.name):
+		if action_key[action.name].has(device):
+			action_key[action.name][device].append(input_name)
+		else:
+			action_key[action.name][device] = [input_name]
+	else:
+		action_key[action.name] = {device = [input_name]}
 	
 func init_buffer():
 	for device in config.device_count + 1:
@@ -132,91 +142,40 @@ func get_action_by_name(name: String, control_code: int = -1) -> Action:
 		push_error("Action " + name + " does not exist in current control maps") 
 	return null
 
-# USED FOR ACTION_NAME_HAS_EVENT
-func input_has_event(device: int, action_name: String, input_type: INPUT_TYPE, index: int, event: InputEvent):
-		var input_name = build_input_name(device, action_name, input_type, index)
-		if InputMap.action_has_event(input_name, event):
-			return true
-		else:
-			return false
+func is_specific_controller(control_code):
+	return range(control_maps.size()).has(control_code)
 
-# USED FOR ACTION_NAME_HAS_EVENT
-func map_has_event(map: Map, device: int, action_name: String, event: InputEvent):
-	for action in map.actions:
-		if device == 0:
-			for i in range(action.keys.size()):
-				if input_has_event(device, action_name, INPUT_TYPE.KEY, i, event):
-					return true
-			for i in range(action.mouse_buttons.size()):
-				if input_has_event(device, action_name, INPUT_TYPE.MOUSE_BUTTON, i, event):
-					return true
-		else:
-			for i in range(action.joy_buttons.size()):
-				if input_has_event(device, action_name, INPUT_TYPE.JOY_BUTTON, i, event):
-					return true
-			for i in range(action.axii.size()):
-				if input_has_event(device, action_name, INPUT_TYPE.AXIS, i, event):
-					return true
-
-func map_has_action(map: Map, action_name: String):
-	#TODO: Use this to catch checking maps for actions that don't exist.
-	for action in map.actions:
-		if action.name == action_name:
+func controller_action_has_event(action_name: String, event: InputEvent, control_code: int = -1):
+	var actions = action_key[action_name][control_code]
+	for action in actions:
+		if InputMap.action_has_event(action, event):
 			return true
 	return false
 
-# Check for input with action name
 func action_has_event(action_name: String, event: InputEvent, control_code: int = -1):
-	if !range(control_maps.size()).has(control_code):
-		for device in control_maps.size():
-			var map := control_maps[device]
-			if map_has_event(map, device, action_name, event):
-				return true
+	if is_specific_controller(control_code): return controller_action_has_event(action_name, event, control_code)
 	else:
-		var map := control_maps[control_code]
-		if map_has_event(map, control_code, action_name, event):
+		for device in control_maps.size():
+			if controller_action_has_event(action_name, event, device):
+				return true
+		return false
+
+func is_controller_action_just_pressed(action_name: String, control_code: = -1):
+	var actions = action_key[action_name][control_code]
+	print(actions)
+	for action in actions:
+		if Input.is_action_just_pressed(action):
 			return true
 	return false
-	
-# USED FOR IS_ACTION_JUST_PRESSED
-func is_input_just_pressed(device: int, action_name: String, input_type: INPUT_TYPE, index: int):
-	var input_name = build_input_name(device, action_name, input_type, index)
-	return Input.is_action_just_pressed(input_name)
 
-# USED FOR IS_ACTION_JUST_PRESSED
-func is_map_action_just_pressed(map: Map, device: int, action_name: String):
-	var action: Action = get_action_by_name(action_name, device)
-	if device == 0:
-		for i in range(action.keys.size()):
-			if is_input_just_pressed(device, action_name, INPUT_TYPE.KEY, i):
-				return true
-		for i in range(action.mouse_buttons.size()):
-			if is_input_just_pressed(device, action_name, INPUT_TYPE.MOUSE_BUTTON, i):
-				return true
+func is_action_just_pressed(action_name: String, control_code: = -1):
+	if is_specific_controller(control_code): return is_controller_action_just_pressed(action_name, control_code)
 	else:
-		for i in range(action.joy_buttons.size()):
-			if is_input_just_pressed(device, action_name, INPUT_TYPE.JOY_BUTTON, i):
-				return true
-		for i in range(action.axii.size()):
-			if is_input_just_pressed(device, action_name, INPUT_TYPE.AXIS, i):
-				return true
-	return false
-
-func is_action_just_pressed(action_name: String, control_code: = -1, event: InputEvent = null):
-	#Clear extra input events
-	if event:
-		if !action_has_event(action_name, event, control_code):
-			return
-	
-	#If control code is outside possible range, check all controllers
-	if !range(control_maps.size()).has(control_code):
 		for device in control_maps.size():
-			var map := control_maps[device]
-			if is_map_action_just_pressed(map, device, action_name):
+			if is_controller_action_just_pressed(action_name, device):
 				return true
-	else:
-		var map := control_maps[control_code]
-		return is_map_action_just_pressed(map, control_code, action_name)
+		return false
+		
 
 # USED FOR IS_ACTION_PRESSED
 func is_input_pressed(device: int, action_name: String, input_type: INPUT_TYPE, index: int):

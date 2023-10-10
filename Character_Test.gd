@@ -19,6 +19,13 @@ func _physics_process(_delta):
 	
 	if Controls.is_action_just_flicked("Right"):
 		print("Flicked Right")
-
-
+		
 	move_and_slide()
+
+func _input(event):
+	if event.is_echo(): return
+	
+	if !Controls.action_has_event("Right", event): return
+	
+	if Controls.is_action_just_pressed("Right"):
+		print("Right was just pressed!")
