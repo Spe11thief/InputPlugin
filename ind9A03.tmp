@@ -1,9 +1,8 @@
-[gd_scene load_steps=6 format=3 uid="uid://bk7ceoqbuicop"]
+[gd_scene load_steps=5 format=3 uid="uid://bk7ceoqbuicop"]
 
 [ext_resource type="Script" path="res://test.gd" id="1_uwkt3"]
 [ext_resource type="Script" path="res://Character_Test.gd" id="2_e0rc7"]
 [ext_resource type="Texture2D" uid="uid://ymge4wvl66r4" path="res://icon.svg" id="3_bs7xu"]
-[ext_resource type="Script" path="res://FPS Counter.gd" id="4_kh58c"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ttm7m"]
 
@@ -22,26 +21,3 @@ texture = ExtResource("3_bs7xu")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Node2D/CharacterBody2D"]
 shape = SubResource("RectangleShape2D_ttm7m")
-
-[node name="Control" type="Control" parent="."]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="MarginContainer" type="MarginContainer" parent="Control"]
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_bottom = 26.0
-grow_horizontal = 2
-theme_override_constants/margin_left = 10
-theme_override_constants/margin_top = 6
-
-[node name="FPS Counter" type="Label" parent="Control/MarginContainer"]
-layout_mode = 2
-text = "60 fps
-"
-script = ExtResource("4_kh58c")

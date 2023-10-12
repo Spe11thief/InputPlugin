@@ -143,7 +143,7 @@
 				},
 				{
 					"details": "Fix vector deadzone?",
-					"done": false
+					"done": true
 				},
 				{
 					"details": "clear_buffer",

@@ -85,54 +85,9 @@ func commit_action_input_to_map(action: Action, device: int, input_type: INPUT_T
 		if !action_key[action.name].deadzones.has(device):
 			action_key[action.name].deadzones[device] = 0
 		action_key[action.name].deadzones[device] = max(deadzone, action_key[action.name].deadzones.has(device) if action_key[action.name].deadzones[device] else 0)
-	
-func init_buffer():
-	for device in config.device_count + 1:
-		for action in config.default_control_map.actions:
-			buffer["p" + str(device) + "_" + action.name] = [{"strength" : 0, "time": 0}]
-			
-func clean_input_buffer():
-	for control_action in buffer:
-		var current_time = Time.get_ticks_msec()
-		for input in buffer[control_action]:
-			if input.time + config.buffer > current_time and buffer[control_action].size() > 1:
-				buffer[control_action].erase(input)
-
-func build_action_buffer_name(action_name: String, control_code: int):
-	return "p" + str(control_code) + "_" + action_name
-	
-func build_event_buffer_action_names(event):
-	var action_names = []
-	for i in range(control_maps.size()):
-		var map := control_maps[i]
-		for action in map.actions:
-			if action_has_event(action.name, event):
-				action_names.append(build_action_buffer_name(action.name, i))
-	return action_names
-
-# TODO: Come back once get control_code is a thing
-func record_input_buffer(event: InputEvent):
-	if event.is_echo(): return
-	var action_buffer_names = build_event_buffer_action_names(event)
-	for action_name in action_buffer_names:
-		var device = action_name[1] as int
-		var action = action_name.get_slice("_",1)
-		var input_strength = Controls.get_action_raw_strength(action, device)
-		if buffer[action_name].size() > 0 and buffer[action_name][0].strength == input_strength: break
-		buffer[action_name].push_front({"strength" = input_strength, "time" = Time.get_ticks_msec()})
 
 func _ready():
 	init_maps()
-	init_buffer()
-
-func _process(delta):
-	#Was commented out in the other game for some reason? Maybe performance issues
-	clean_input_buffer()
-	pass
-	
-func _input(event):
-	record_input_buffer(event)
-	pass
 	
 func get_action_by_name(name: String, control_code := -1) -> Action:
 	if !range(control_maps.size()).has(control_code):
@@ -220,7 +175,7 @@ func get_action_raw_strength(action_name: String, control_code := -1) -> float:
 	for device in control_maps.size():
 		strengths.append(get_controller_action_raw_strength(action_name, device))
 	return strengths.max()
-		
+
 func get_controller_action_strength(action_name : String, control_code : int) -> float:
 	var actions = action_key[action_name][control_code]
 	var strengths = []
@@ -248,9 +203,60 @@ func get_axis(neg_action_name : String, pos_action_name, control_code := -1) -> 
 func action_get_deadzone(action_name : String, control_code : int):
 	return action_key[action_name].deadzones[control_code]
 		
+func get_controller_action_strongest_input(action_name : String, control_code : int):
+	var inputs = action_key[action_name][control_code]
+	var strengths = []
+	for input in inputs:
+		strengths.append({"input": input, "strength": Input.get_action_raw_strength(input)})
+	return get_strongest_strength(strengths)
+
+func get_action_strongest_input(action_name : String, control_code := -1):
+	if is_specific_controller(control_code): return get_controller_action_strongest_input(action_name, control_code)
+	var strengths = []
+	for device in control_maps.size():
+		strengths.append(get_controller_action_strongest_input(action_name, device))
+	return get_strongest_strength(strengths)
+
+func get_strongest_strength(strengths):
+	#Finish get_vector using only axis or buttons, update strongest_input functions to use new InputStrength class
+	var strongest_input = null
+	for strength in strengths:
+		if !strongest_input:
+			strongest_input = strength
+		else:
+			if strongest_input.strength < strength.strength:
+				strongest_input = strength
+	return strongest_input
+
+func is_input_axis(input) -> bool:
+	return input.input.contains("axis")
 
 func get_controller_vector(neg_x_action_name : String, pos_x_action_name : String, neg_y_action_name : String, pos_y_action_name : String, control_code : int, deadzone = null):
-	var vector = Vector2(get_action_raw_strength(pos_x_action_name, control_code) - get_action_raw_strength(neg_x_action_name, control_code), get_action_raw_strength(pos_y_action_name, control_code) - get_action_raw_strength(neg_y_action_name, control_code))
+	var inputs = {
+		"neg_x": get_controller_action_strongest_input(neg_x_action_name, control_code),
+		"pos_x": get_controller_action_strongest_input(pos_x_action_name, control_code),
+		"neg_y": get_controller_action_strongest_input(neg_y_action_name, control_code),
+		"pos_y": get_controller_action_strongest_input(pos_y_action_name, control_code)
+	}
+	var is_axis := false
+	var strongest_input = null
+	for input in inputs.keys():
+		if !strongest_input:
+			strongest_input = inputs[input]
+		if strongest_input.strength < inputs[input].strength:
+			strongest_input = inputs[input]
+	if is_input_axis(strongest_input): is_axis = true
+	var strengths = {
+		"neg_x": 0,
+		"pos_x": 0,
+		"neg_y": 0,
+		"pos_y": 0
+	}
+	for key in inputs.keys():
+		if is_input_axis(inputs[key]) == is_axis:
+			strengths[key] = inputs[key].strength
+
+	var vector = Vector2(strengths.pos_x - strengths.neg_x, strengths.pos_y - strengths.neg_y)
 	if !deadzone:
 		deadzone = max(
 		action_get_deadzone(neg_x_action_name, control_code),
@@ -260,13 +266,23 @@ func get_controller_vector(neg_x_action_name : String, pos_x_action_name : Strin
 		)
 	if vector.length() < deadzone: return Vector2(0,0)
 	return vector
-	
 
 func get_vector(neg_x_action_name : String, pos_x_action_name : String, neg_y_action_name : String, pos_y_action_name : String, control_code := -1, deadzone = null):
 	if is_specific_controller(control_code): return get_controller_vector(neg_x_action_name, pos_x_action_name, neg_y_action_name, pos_y_action_name, control_code, deadzone)
+	var vectors : Array[Vector2] = []
+	for device in control_maps.size():
+		vectors.append(get_controller_vector(neg_x_action_name, pos_x_action_name, neg_y_action_name, pos_y_action_name, device, deadzone))
+	return vectors.reduce(func(max : Vector2, val : Vector2): return val if abs(val.length_squared()) > abs(max.length_squared()) else max)
+
+func get_controller_raw_vector(neg_x_action_name : String, pos_x_action_name : String, neg_y_action_name : String, pos_y_action_name : String, control_code : int):
+	var vector = Vector2(get_action_raw_strength(pos_x_action_name, control_code) - get_action_raw_strength(neg_x_action_name, control_code), get_action_raw_strength(pos_y_action_name, control_code) - get_action_raw_strength(neg_y_action_name, control_code))
+	return vector
+
+func get_raw_vector(neg_x_action_name : String, pos_x_action_name : String, neg_y_action_name : String, pos_y_action_name : String, control_code := -1):
+	if is_specific_controller(control_code): return get_controller_raw_vector(neg_x_action_name, pos_x_action_name, neg_y_action_name, pos_y_action_name, control_code)
 	var vectors = []
 	for device in control_maps.size():
-		vectors.append(get_controller_vector(neg_x_action_name, pos_x_action_name, neg_y_action_name, pos_y_action_name, device, deadzone)) 
+		vectors.append(get_controller_raw_vector(neg_x_action_name, pos_x_action_name, neg_y_action_name, pos_y_action_name, device)) 
 	return vectors.reduce(func(max : Vector2, val : Vector2): return val if abs(val.length_squared()) > abs(max.length_squared()) else max)
 
 func get_event_device(event):
@@ -276,29 +292,3 @@ func get_event_device(event):
 			if action_has_event(action.name, event):
 				return i
 	return -1
-
-func check_buffer_for_action_flick(action_name: String, deadzone := .1, flick_strength := .9, flick_window := .1, control_code := -1, event: InputEvent = null):
-	var current_strength = get_action_strength(action_name, control_code)
-	if abs(current_strength) < flick_strength: return false
-	var current_time = Time.get_ticks_msec()
-	var starting_time = current_time - (flick_window * 1000)
-	var buffer_name = build_action_buffer_name(action_name, control_code)
-	var final_deadzone = max(deadzone, get_action_by_name(action_name, control_code).deadzone)
-	for buffer_frame in buffer[buffer_name]:
-		if buffer_frame.time >= starting_time and abs(buffer_frame.strength) < final_deadzone:
-			return true
-	return false
-
-func is_action_just_flicked(action_name: String, deadzone := .1, flick_strength := .9, flick_window := .1, control_code := -1, event: InputEvent = null):
-	if event:
-		if !action_has_event(action_name, event, control_code):
-			printerr("action does not have event")
-			return
-	if !range(control_maps.size()).has(control_code):
-		for device in control_maps.size():
-			if check_buffer_for_action_flick(action_name, deadzone, flick_strength, flick_window, device, event):
-				return true
-	else:
-		if check_buffer_for_action_flick(action_name, deadzone, flick_strength, flick_window, control_code, event):
-			return true
-	return false
