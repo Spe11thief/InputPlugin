@@ -20,9 +20,7 @@
 		{
 			"uuid": "887b2189-fc49-4c1a-bd11-7c9eb62eeb1c",
 			"title": "Doing",
-			"tasks": [
-				"eafbf31f-3f5d-4f7c-a078-b90bca195e32"
-			]
+			"tasks": []
 		},
 		{
 			"uuid": "8694295f-f88a-4e66-b604-271e96852cf7",
@@ -31,7 +29,8 @@
 				"6c447c10-4428-4187-bf4b-046c3622c8be",
 				"6b8cba9a-39ec-4b6b-adfc-3eaa76a46bf3",
 				"426b9a0b-de92-4fc6-bef3-ece887f30cd4",
-				"64c2d9d3-db96-46a9-b3d9-4602e3bd7328"
+				"64c2d9d3-db96-46a9-b3d9-4602e3bd7328",
+				"eafbf31f-3f5d-4f7c-a078-b90bca195e32"
 			]
 		}
 	],
@@ -95,7 +94,7 @@
 				},
 				{
 					"details": "record_input_buffer",
-					"done": false
+					"done": true
 				},
 				{
 					"details": "is_action_just_pressed",
@@ -147,7 +146,7 @@
 				},
 				{
 					"details": "clear_buffer",
-					"done": false
+					"done": true
 				}
 			]
 		},

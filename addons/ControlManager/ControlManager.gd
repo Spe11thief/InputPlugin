@@ -86,8 +86,40 @@ func commit_action_input_to_map(action: Action, device: int, input_type: INPUT_T
 			action_key[action.name].deadzones[device] = 0
 		action_key[action.name].deadzones[device] = max(deadzone, action_key[action.name].deadzones.has(device) if action_key[action.name].deadzones[device] else 0)
 
+func init_buffer():
+	for i in control_maps.size():
+		var map = control_maps[i]
+		for action in map.actions:
+			if !buffer.has(action.name):
+				buffer[action.name] = {}
+			if !buffer[action.name].has(i):
+				buffer[action.name][i] = [{"time": 0, "strength": 0}]
+
+func record_event_in_buffer(event : InputEvent):
+	# This might need to get streamlined into a single function to reduce comp times
+	var action_name = get_event_action_name(event)
+	if !action_name: return
+	var device = get_event_device(event)
+	buffer[action_name][device].append({"time": Time.get_ticks_msec(), "strength": get_action_raw_strength(action_name, device)})
+	prints(action_name, buffer[action_name][device])
+
+func clean_buffer():
+	for action in buffer.keys():
+		for device in buffer[action].keys():
+			for input in buffer[action][device]:
+				if input.time < Time.get_ticks_msec() - config.buffer and buffer[action][device].size() > 1:
+					buffer[action][device].erase(input)
+
 func _ready():
 	init_maps()
+	init_buffer()
+	
+func _input(event):
+	if event.is_echo(): return
+	record_event_in_buffer(event)
+	
+func _process(_delta):
+	clean_buffer()
 	
 func get_action_by_name(name: String, control_code := -1) -> Action:
 	if !range(control_maps.size()).has(control_code):
@@ -285,10 +317,33 @@ func get_raw_vector(neg_x_action_name : String, pos_x_action_name : String, neg_
 		vectors.append(get_controller_raw_vector(neg_x_action_name, pos_x_action_name, neg_y_action_name, pos_y_action_name, device)) 
 	return vectors.reduce(func(max : Vector2, val : Vector2): return val if abs(val.length_squared()) > abs(max.length_squared()) else max)
 
-func get_event_device(event):
+func get_event_device(event : InputEvent) -> int:
 	for i in range(control_maps.size()):
 		var map := control_maps[i]
 		for action in map.actions:
 			if action_has_event(action.name, event):
 				return i
 	return -1
+
+func get_event_action_name(event : InputEvent):
+	for i in range(control_maps.size()):
+		var map:= control_maps[i]
+		for action in map.actions:
+			if action_has_event(action.name, event):
+				return action.name
+
+func is_controller_action_flicked(action_name : String, strength : float, control_code : int) -> bool:
+	for input in buffer[action_name][control_code]:
+		if input.strength == 0:
+			buffer[action_name][control_code].erase(input)
+			return true
+	return false
+
+func is_action_flicked(action_name : String, min_flick_strength : float, control_code := -1) -> bool:
+	var strength = get_action_raw_strength(action_name, control_code)
+	if strength < min_flick_strength: return false
+	if is_specific_controller(control_code): return is_controller_action_flicked(action_name, strength, control_code)
+	for device in control_maps.size():
+		if is_controller_action_flicked(action_name, strength, device):
+			return true
+	return false
