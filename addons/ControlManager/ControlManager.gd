@@ -188,7 +188,7 @@ func is_controller_action_just_released(action_name: String, control_code := -1)
 	return false
 
 func is_action_just_released(action_name: String, control_code := -1) -> bool:
-	if is_specific_controller(control_code): return is_controller_action_just_pressed(action_name, control_code)
+	if is_specific_controller(control_code): return is_controller_action_just_released(action_name, control_code)
 	for device in control_maps.size():
 		if is_controller_action_just_released(action_name, device):
 			return true
@@ -321,7 +321,7 @@ func get_event_device(event : InputEvent) -> int:
 	for i in range(control_maps.size()):
 		var map := control_maps[i]
 		for action in map.actions:
-			if action_has_event(action.name, event):
+			if action_has_event(action.name, event, i):
 				return i
 	return -1
 
