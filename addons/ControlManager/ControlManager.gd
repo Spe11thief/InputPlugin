@@ -68,6 +68,7 @@ func commit_action_input_to_map(action: Action, device: int, input_type: INPUT_T
 			ev = InputEventJoypadMotion.new()
 			ev.axis = action.axii[input_index].axis
 			ev.axis_value = action.axii[input_index].direction
+	ev.device = device - 1
 	InputMap.action_add_event(input_name, ev)
 	
 	#Add built action_name to action_key
@@ -101,13 +102,12 @@ func record_event_in_buffer(event : InputEvent):
 	if !action_name: return
 	var device = get_event_device(event)
 	buffer[action_name][device].append({"time": Time.get_ticks_msec(), "strength": get_action_raw_strength(action_name, device)})
-	prints(action_name, buffer[action_name][device])
 
 func clean_buffer():
 	for action in buffer.keys():
 		for device in buffer[action].keys():
 			for input in buffer[action][device]:
-				if input.time < Time.get_ticks_msec() - config.buffer and buffer[action][device].size() > 1:
+				if input.time < Time.get_ticks_msec() - config.buffer and buffer[action][device].size() > 2:
 					buffer[action][device].erase(input)
 
 func _ready():
@@ -115,7 +115,7 @@ func _ready():
 	init_buffer()
 	
 func _input(event):
-	if event.is_echo(): return
+#	if event.is_echo(): return
 	record_event_in_buffer(event)
 	
 func _process(_delta):
@@ -332,18 +332,20 @@ func get_event_action_name(event : InputEvent):
 			if action_has_event(action.name, event):
 				return action.name
 
-func is_controller_action_flicked(action_name : String, strength : float, control_code : int) -> bool:
+func is_controller_action_flicked(action_name : String, control_code : int, min_flick_strength : float) -> bool:
+	var strength = get_action_raw_strength(action_name, control_code)
+	if strength < min_flick_strength: return false
+	var deadzone = action_get_deadzone(action_name, control_code)
 	for input in buffer[action_name][control_code]:
-		if input.strength == 0:
-			buffer[action_name][control_code].erase(input)
+		if abs(input.strength) <= deadzone:
+			for sub_input in buffer[action_name][control_code]:
+				buffer[action_name][control_code].clear()
 			return true
 	return false
 
-func is_action_flicked(action_name : String, min_flick_strength : float, control_code := -1) -> bool:
-	var strength = get_action_raw_strength(action_name, control_code)
-	if strength < min_flick_strength: return false
-	if is_specific_controller(control_code): return is_controller_action_flicked(action_name, strength, control_code)
+func is_action_flicked(action_name : String, control_code := -1, min_flick_strength := 0.9) -> bool:
+	if is_specific_controller(control_code): return is_controller_action_flicked(action_name, control_code, min_flick_strength)
 	for device in control_maps.size():
-		if is_controller_action_flicked(action_name, strength, device):
+		if is_controller_action_flicked(action_name, device, min_flick_strength):
 			return true
 	return false
