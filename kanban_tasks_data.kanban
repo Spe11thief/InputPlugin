@@ -11,15 +11,13 @@
 			"uuid": "169fba29-2cbc-46ad-b4a6-11b95270b2c5",
 			"title": "Todo",
 			"tasks": [
-				"eba0236d-ad13-4403-959d-15bfcae50cc3",
 				"8eaf0f6a-a30a-4aee-929b-00eac7a0194b",
-				"402ab9ab-60dd-4eb5-97c7-aa63bbc75a56",
-				"1bf34c80-7594-432e-a05b-bc5f4de29401"
+				"64da743a-a5b9-46ea-a73d-126566522712"
 			]
 		},
 		{
 			"uuid": "887b2189-fc49-4c1a-bd11-7c9eb62eeb1c",
-			"title": "Doing",
+			"title": "WIP",
 			"tasks": []
 		},
 		{
@@ -30,7 +28,10 @@
 				"6b8cba9a-39ec-4b6b-adfc-3eaa76a46bf3",
 				"426b9a0b-de92-4fc6-bef3-ece887f30cd4",
 				"64c2d9d3-db96-46a9-b3d9-4602e3bd7328",
-				"eafbf31f-3f5d-4f7c-a078-b90bca195e32"
+				"eafbf31f-3f5d-4f7c-a078-b90bca195e32",
+				"eba0236d-ad13-4403-959d-15bfcae50cc3",
+				"402ab9ab-60dd-4eb5-97c7-aa63bbc75a56",
+				"1bf34c80-7594-432e-a05b-bc5f4de29401"
 			]
 		}
 	],
@@ -158,19 +159,19 @@
 			"steps": [
 				{
 					"details": "init new action's buffer",
-					"done": false
+					"done": true
 				},
 				{
 					"details": "update device's map in control_maps array",
-					"done": false
+					"done": true
 				},
 				{
 					"details": "remove old device godot InputActions",
-					"done": false
+					"done": true
 				},
 				{
 					"details": "Create new Godot InputActions",
-					"done": false
+					"done": true
 				}
 			]
 		},
@@ -212,6 +213,13 @@
 		{
 			"uuid": "64c2d9d3-db96-46a9-b3d9-4602e3bd7328",
 			"title": "Set default Deadzone to .2",
+			"description": "",
+			"category": "6c174045-0e39-4605-89e6-ef9b6a922015",
+			"steps": []
+		},
+		{
+			"uuid": "64da743a-a5b9-46ea-a73d-126566522712",
+			"title": "is_action_held_for",
 			"description": "",
 			"category": "6c174045-0e39-4605-89e6-ef9b6a922015",
 			"steps": []

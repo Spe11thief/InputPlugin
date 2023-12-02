@@ -61,5 +61,6 @@ axii = Array[ExtResource("1_pugmd")]([SubResource("Resource_e7lyx")])
 deadzone = 0.2
 
 [resource]
+resource_local_to_scene = true
 script = ExtResource("3_x6ees")
 actions = Array[ExtResource("2_1sdb4")]([SubResource("Resource_dnaxs"), SubResource("Resource_1elai"), SubResource("Resource_oj6kv"), SubResource("Resource_5p2ev")])

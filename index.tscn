@@ -1,9 +1,10 @@
-[gd_scene load_steps=6 format=3 uid="uid://bk7ceoqbuicop"]
+[gd_scene load_steps=7 format=3 uid="uid://bk7ceoqbuicop"]
 
 [ext_resource type="Script" path="res://test.gd" id="1_uwkt3"]
 [ext_resource type="Script" path="res://Character_Test.gd" id="2_e0rc7"]
 [ext_resource type="Texture2D" uid="uid://ymge4wvl66r4" path="res://icon.svg" id="3_bs7xu"]
 [ext_resource type="Script" path="res://FPS Counter.gd" id="4_kh58c"]
+[ext_resource type="Script" path="res://Remap_Box.gd" id="4_mx70o"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ttm7m"]
 
@@ -31,12 +32,63 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[node name="Pause" type="MarginContainer" parent="Control"]
+process_mode = 3
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Remap_Box" type="MarginContainer" parent="Control/Pause"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+script = ExtResource("4_mx70o")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control/Pause/Remap_Box"]
+layout_mode = 2
+size_flags_horizontal = 4
+alignment = 1
+
+[node name="Remap_Up" type="Button" parent="Control/Pause/Remap_Box/VBoxContainer"]
+layout_mode = 2
+text = "Up"
+
+[node name="Remap_Down" type="Button" parent="Control/Pause/Remap_Box/VBoxContainer"]
+layout_mode = 2
+text = "Down"
+
+[node name="Remap_Left" type="Button" parent="Control/Pause/Remap_Box/VBoxContainer"]
+layout_mode = 2
+text = "Left"
+
+[node name="Remap_Right" type="Button" parent="Control/Pause/Remap_Box/VBoxContainer"]
+layout_mode = 2
+text = "Right"
+
+[node name="Commit" type="Button" parent="Control/Pause/Remap_Box/VBoxContainer"]
+layout_mode = 2
+text = "Commit"
+
+[node name="Awaiting_Input" type="Label" parent="Control/Pause/Remap_Box"]
+visible = false
+layout_mode = 2
+text = "Awaiting Input..."
+horizontal_alignment = 1
+
 [node name="MarginContainer" type="MarginContainer" parent="Control"]
 layout_mode = 1
-anchors_preset = 10
+anchors_preset = 15
 anchor_right = 1.0
-offset_bottom = 26.0
+anchor_bottom = 1.0
 grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 6
 
@@ -45,3 +97,9 @@ layout_mode = 2
 text = "60 fps
 "
 script = ExtResource("4_kh58c")
+
+[connection signal="pressed" from="Control/Pause/Remap_Box/VBoxContainer/Remap_Up" to="Control/Pause/Remap_Box" method="_on_remap_up_pressed"]
+[connection signal="pressed" from="Control/Pause/Remap_Box/VBoxContainer/Remap_Down" to="Control/Pause/Remap_Box" method="_on_remap_down_pressed"]
+[connection signal="pressed" from="Control/Pause/Remap_Box/VBoxContainer/Remap_Left" to="Control/Pause/Remap_Box" method="_on_remap_left_pressed"]
+[connection signal="pressed" from="Control/Pause/Remap_Box/VBoxContainer/Remap_Right" to="Control/Pause/Remap_Box" method="_on_remap_right_pressed"]
+[connection signal="pressed" from="Control/Pause/Remap_Box/VBoxContainer/Commit" to="Control/Pause/Remap_Box" method="_on_commit_pressed"]

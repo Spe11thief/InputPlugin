@@ -11,37 +11,94 @@ var input_dic = [
 	"key", "mouse_button", "joy_button", "axis"
 ]
 
+var map_file_path := "user://control_maps/"
+@export var clear_saved_maps := false
+
 @onready var config: ControlManagerConfiguaration = preload("res://addons/ControlManager/ControlConfig.tres")
 
 var buffer = {}
-
-var control_maps: Array[Map] = []
-
+@export var control_maps: Array[Map] = []
 var action_key = {}
 
+func _ready():
+	if !clear_saved_maps: load_user_maps()
+	else: delete_user_maps()
+	apply_current_maps()
+	
+func save_current_user_maps():
+	var dir = DirAccess.open(map_file_path)
+	if !dir:
+		print("Creating control maps directory")
+		DirAccess.make_dir_absolute(map_file_path)
+		return
+	for map_slot in control_maps.size():
+		var success = ResourceSaver.save(control_maps[map_slot], map_file_path + "player_" + str(map_slot + 1) + "_control_map.tres")
+		if success != OK: push_error("Failed to save map_" + str(map_slot))
+
+func load_user_maps():
+	var dir := DirAccess.open(map_file_path)
+	if !dir:
+		print("No control maps directory")
+		return
+	var map_slot = 0
+	for file in dir.get_files().size():
+		var resource = ResourceLoader.load(map_file_path + "player_" + str(map_slot + 1) + "_control_map.tres", "Map")
+		if !resource is Map: continue
+		if control_maps.size() > map_slot:
+			control_maps[map_slot] = resource
+			map_slot += 1
+		else:
+			control_maps.append(resource)
+			map_slot += 1
+			
+func delete_user_maps():
+	var dir := DirAccess.open(map_file_path)
+	if !dir:
+		print("No control maps directory")
+		return
+	var map_slot = 0
+	for file in dir.get_files().size():
+		var success = dir.remove(map_file_path + "player_" + str(map_slot + 1) + "_control_map.tres")
+		
+func apply_current_maps():
+	print("Applying Maps")
+	init_maps()
+	init_buffer()
+	save_current_user_maps()
+	
+func init_buffer():
+	buffer = {}
+	for i in control_maps.size():
+		var map = control_maps[i]
+		for action in map.actions:
+			if !buffer.has(action.name):
+				buffer[action.name] = {}
+			if !buffer[action.name].has(i):
+				buffer[action.name][i] = [{"time": 0, "strength": 0}]
+
 func clear_godot_input_map():
-	var actions = InputMap.get_actions()
+	var actions := InputMap.get_actions()
+	for action in actions:
+		InputMap.erase_action(action)
+
+func create_control_map_inputs(device : int):
+	var map := control_maps[device]
+	for action in map.actions:
+		if device == 0:
+			for i in range(action.keys.size()):
+				commit_action_input_to_map(action, device, INPUT_TYPE.KEY, i)
+			for i in range(action.mouse_buttons.size()):
+				commit_action_input_to_map(action, device, INPUT_TYPE.MOUSE_BUTTON, i)
+		else:
+			for i in range(action.joy_buttons.size()):
+				commit_action_input_to_map(action, device, INPUT_TYPE.JOY_BUTTON, i)
+			for i in range(action.axii.size()):
+				commit_action_input_to_map(action, device, INPUT_TYPE.AXIS, i, action.deadzone)
 
 func init_maps():
 	clear_godot_input_map()
-	#run initialization for keyboard + mouse and each controller
-	for device in config.device_count + 1:
-		for action in config.default_control_map.actions:
-			#run if keyboard + mouse
-			if device == 0:
-				for i in range(action.keys.size()):
-					commit_action_input_to_map(action, device, INPUT_TYPE.KEY, i)
-				for i in range(action.mouse_buttons.size()):
-					commit_action_input_to_map(action, device, INPUT_TYPE.MOUSE_BUTTON, i)
-					
-			#run if controller
-			else:
-				for i in range(action.joy_buttons.size()):
-					commit_action_input_to_map(action, device, INPUT_TYPE.JOY_BUTTON, i)
-				for i in range(action.axii.size()):
-					commit_action_input_to_map(action, device, INPUT_TYPE.AXIS, i, action.deadzone)
-		control_maps.append(config.default_control_map.duplicate(true))
-	print(action_key)
+	for device in control_maps.size():
+		create_control_map_inputs(device)
 	
 func build_input_name(device: int, action_name: String, input_type: INPUT_TYPE, index: int):
 	return "p" + str(device) + "_" + action_name + "_" + input_dic[input_type] + "_" + str(index)
@@ -85,16 +142,69 @@ func commit_action_input_to_map(action: Action, device: int, input_type: INPUT_T
 	else:
 		if !action_key[action.name].deadzones.has(device):
 			action_key[action.name].deadzones[device] = 0
-		action_key[action.name].deadzones[device] = max(deadzone, action_key[action.name].deadzones.has(device) if action_key[action.name].deadzones[device] else 0)
+		action_key[action.name].deadzones[device] = max(deadzone, (action_key[action.name].deadzones[device] if action_key[action.name].deadzones.has(device) else 0))
 
-func init_buffer():
-	for i in control_maps.size():
-		var map = control_maps[i]
-		for action in map.actions:
-			if !buffer.has(action.name):
-				buffer[action.name] = {}
-			if !buffer[action.name].has(i):
-				buffer[action.name][i] = [{"time": 0, "strength": 0}]
+func clear_action_mappings(map_slot : int, action_name : String):
+	var map : Map = control_maps[map_slot]
+	var action : Action
+	for act in map.actions:
+		if act.name == action_name: action = act
+	if !action: return false
+	action.keys.clear()
+	action.mouse_buttons.clear()
+	action.joy_buttons.clear()
+	action.axii.clear()
+	action_key[action_name][map_slot] = []
+
+func add_action_mapping(map_slot : int, action_name : String, event : InputEvent):
+	var action : Action = get_action_by_name(action_name, map_slot)
+	if !action or action_has_event(action_name, event, map_slot):
+		push_error("Action already has event assigned" + event.as_text())
+		print(action.keys)
+		return
+	
+	if event is InputEventKey:
+		var mapping = event.keycode
+		prints("Adding", event.as_text(), "to", action_name)
+		action.keys.append(mapping)
+	if event is InputEventMouseButton:
+		var mapping = event.button_index
+		prints("Adding", event.as_text(), "to", action_name)
+		action.mouse_buttons.append(mapping)
+	if event is InputEventJoypadButton:
+		var mapping = event.button_index
+		prints("Adding", event.as_text(), "to", action_name)
+		action.joy_buttons.append(mapping)
+	if event is InputEventJoypadMotion:
+		if !abs(event.axis_value) > .9: return
+		var mapping = event.axis
+		var direction = sign(event.axis_value)
+		prints("Adding", event.as_text(), "to", action_name)
+		var new_axis = Axis.new()
+		new_axis.axis = mapping
+		new_axis.direction = direction
+		action.axii.append(new_axis)
+
+func remove_action_mapping(map_slot : int, action_name : String, event : InputEvent):
+	var action : Action = get_action_by_name(action_name, map_slot)
+	if !action or !action_has_event(action_name, event, map_slot): return
+	
+	if event is InputEventKey:
+		var mapping = event.keycode
+		action.keys.erase(mapping)
+	if event is InputEventMouseButton:
+		var mapping = event.button_index
+		action.mouse_buttons.erase(mapping)
+	if event is InputEventJoypadButton:
+		var mapping = event.button_index
+		action.joy_buttons.erase(mapping)
+	if event is InputEventJoypadMotion:
+		var mapping = event.axis
+		var direction = sign(event.axis_value)
+		var new_axis = Axis.new()
+		new_axis.axis = mapping
+		new_axis.direction = direction
+		action.axii.erase(new_axis)
 
 func record_event_in_buffer(event : InputEvent):
 	# This might need to get streamlined into a single function to reduce comp times
@@ -110,12 +220,7 @@ func clean_buffer():
 				if input.time < Time.get_ticks_msec() - config.buffer and buffer[action][device].size() > 2:
 					buffer[action][device].erase(input)
 
-func _ready():
-	init_maps()
-	init_buffer()
-	
 func _input(event):
-#	if event.is_echo(): return
 	record_event_in_buffer(event)
 	
 func _process(_delta):
@@ -232,7 +337,13 @@ func get_axis(neg_action_name : String, pos_action_name, control_code := -1) -> 
 		axii.append(get_controller_axis(neg_action_name, pos_action_name, device))
 	return axii.reduce(func(max, val): return val if abs(val) > abs(max) else max)
 
-func action_get_deadzone(action_name : String, control_code : int):
+func action_get_deadzone(action_name : String, control_code : int) -> float:
+	if !action_key.has(action_name):
+		push_error("Action '" + action_name + "' is not defined in the actions key")
+		return 0.0
+	if !action_key[action_name].deadzones.has(control_code):
+		push_error("Action '" + action_name + "' does not have any deadzones for map " + str(control_code))
+		return 0.0
 	return action_key[action_name].deadzones[control_code]
 		
 func get_controller_action_strongest_input(action_name : String, control_code : int):

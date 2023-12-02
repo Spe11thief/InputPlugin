@@ -12,12 +12,12 @@ config_version=5
 
 config/name="InputPlugin"
 run/main_scene="res://index.tscn"
-config/features=PackedStringArray("4.1", "Forward Plus")
+config/features=PackedStringArray("4.2", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
 
-Controls="*res://addons/ControlManager/ControlManager.gd"
+Controls="*res://addons/ControlManager/Controls.tscn"
 
 [editor_plugins]
 
