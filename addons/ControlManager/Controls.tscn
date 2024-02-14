@@ -5,5 +5,4 @@
 
 [node name="Controls" type="Node"]
 script = ExtResource("1_73kjb")
-clear_saved_maps = true
 control_maps = Array[Resource("res://addons/ControlManager/Resources/Map.gd")]([ExtResource("2_055xo"), ExtResource("2_055xo"), ExtResource("2_055xo"), ExtResource("2_055xo")])

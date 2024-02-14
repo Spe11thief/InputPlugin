@@ -1,0 +1,93 @@
+[gd_scene load_steps=4 format=3 uid="uid://dnplh0s3bo5g3"]
+
+[sub_resource type="GDScript" id="GDScript_dy3r5"]
+script/source = "@tool
+extends Control
+
+var loaded_map
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	pass
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
+	pass
+"
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_tf33n"]
+
+[sub_resource type="GDScript" id="GDScript_qgvld"]
+script/source = "@tool
+extends Button
+
+
+func _on_pressed():
+	print(\"Hello World!\")
+"
+
+[node name="MainScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = SubResource("GDScript_dy3r5")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_tf33n")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -39.0
+offset_top = -29.0
+offset_right = 39.0
+offset_bottom = 29.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="Button" type="Button" parent="Panel/VBoxContainer"]
+layout_mode = 2
+text = "Print Log"
+script = SubResource("GDScript_qgvld")
+
+[node name="Label" type="Label" parent="Panel/VBoxContainer"]
+layout_mode = 2
+text = "WIP"
+horizontal_alignment = 1
+
+[node name="Panel" type="Panel" parent="Panel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 57.0
+grow_horizontal = 2
+
+[node name="Label" type="Label" parent="Panel/Panel"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_top = -11.5
+offset_right = 40.0
+offset_bottom = 11.5
+grow_vertical = 2
+text = "File"
+
+[connection signal="pressed" from="Panel/VBoxContainer/Button" to="Panel/VBoxContainer/Button" method="_on_pressed"]
