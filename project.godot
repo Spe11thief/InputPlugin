@@ -21,4 +21,4 @@ Controls="*res://addons/ControlManager/Controls.tscn"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/ControlManager/plugin.cfg", "res://addons/kanban_tasks/plugin.cfg")
+enabled=PackedStringArray("res://addons/ControlManager/plugin.cfg", "res://addons/QuickPluginManager/plugin.cfg", "res://addons/kanban_tasks/plugin.cfg")

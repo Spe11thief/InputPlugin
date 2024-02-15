@@ -1,30 +1,33 @@
 [gd_scene load_steps=4 format=3 uid="uid://dnplh0s3bo5g3"]
 
+[ext_resource type="Theme" uid="uid://7te0qtvquq3j" path="res://addons/ControlManager/MainScreen/main_screen_theme.tres" id="1_ds0o7"]
+[ext_resource type="Script" path="res://addons/ControlManager/MainScreen/RefreshButton.gd" id="2_q3lhf"]
+
 [sub_resource type="GDScript" id="GDScript_dy3r5"]
 script/source = "@tool
 extends Control
 
-var loaded_map
+var loaded_sets : Array[ControlSet] = []
+var selected_set = 0
 
-# Called when the node enters the scene tree for the first time.
 func _ready():
-	pass
+	load_sets()
 
+func load_sets():
+	loaded_sets.clear()
+	var dir_access := DirAccess.open(\"res://addons/ControlManager/ControlSets/\")
+	if dir_access:
+		while dir_access.get_next():
+			if dir_access.get_current_type() is ControlSet:
+				var resource_path = dir_access.get_current_path()
+				var resource = ResourceLoader.load(resource_path)
+				loaded_sets.push_back(resource)
+		print(\"Loaded \" + str(loaded_sets.size()) + \" Control Sets\")
+	if selected_set >= selected_set:
+		selected_set = 0
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-	pass
-"
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_tf33n"]
-
-[sub_resource type="GDScript" id="GDScript_qgvld"]
-script/source = "@tool
-extends Button
-
-
-func _on_pressed():
-	print(\"Hello World!\")
+func _on_refresh_button_pressed():
+	print(\"refresh pressed\")
 "
 
 [node name="MainScreen" type="Control"]
@@ -36,58 +39,114 @@ grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+theme = ExtResource("1_ds0o7")
 script = SubResource("GDScript_dy3r5")
 
-[node name="Panel" type="Panel" parent="."]
+[node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxEmpty_tf33n")
+theme = ExtResource("1_ds0o7")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Panel"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -39.0
-offset_top = -29.0
-offset_right = 39.0
-offset_bottom = 29.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="HSplitContainer" type="HSplitContainer" parent="MarginContainer"]
+layout_mode = 2
+theme = ExtResource("1_ds0o7")
+
+[node name="MetaPanel" type="PanelContainer" parent="MarginContainer/HSplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme = ExtResource("1_ds0o7")
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/HSplitContainer/MetaPanel"]
+layout_mode = 2
+theme = ExtResource("1_ds0o7")
+
+[node name="VSplitContainer" type="VSplitContainer" parent="MarginContainer/HSplitContainer/MetaPanel/MarginContainer"]
+layout_mode = 2
+theme = ExtResource("1_ds0o7")
+
+[node name="SetPanel" type="PanelContainer" parent="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme = ExtResource("1_ds0o7")
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel"]
+layout_mode = 2
+theme = ExtResource("1_ds0o7")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
 alignment = 1
 
-[node name="Button" type="Button" parent="Panel/VBoxContainer"]
+[node name="Label" type="Label" parent="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
-text = "Print Log"
-script = SubResource("GDScript_qgvld")
+size_flags_horizontal = 0
+text = "Sets"
+vertical_alignment = 1
 
-[node name="Label" type="Label" parent="Panel/VBoxContainer"]
+[node name="RefreshButton" type="Button" parent="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
-text = "WIP"
-horizontal_alignment = 1
+size_flags_horizontal = 10
+size_flags_vertical = 4
+text = "Refresh"
+script = ExtResource("2_q3lhf")
 
-[node name="Panel" type="Panel" parent="Panel"]
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_bottom = 57.0
-grow_horizontal = 2
+[node name="NewSetButton" type="Button" parent="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "New Set"
 
-[node name="Label" type="Label" parent="Panel/Panel"]
-layout_mode = 1
-anchors_preset = 4
-anchor_top = 0.5
-anchor_bottom = 0.5
-offset_top = -11.5
-offset_right = 40.0
-offset_bottom = 11.5
-grow_vertical = 2
-text = "File"
+[node name="SeatPanel" type="PanelContainer" parent="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 2.5
+theme = ExtResource("1_ds0o7")
 
-[connection signal="pressed" from="Panel/VBoxContainer/Button" to="Panel/VBoxContainer/Button" method="_on_pressed"]
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SeatPanel"]
+layout_mode = 2
+theme = ExtResource("1_ds0o7")
+
+[node name="Label" type="Label" parent="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SeatPanel/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+text = "Seats"
+
+[node name="MessageBox" type="CenterContainer" parent="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SeatPanel"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SeatPanel/MessageBox"]
+layout_mode = 2
+text = "No Selected Set"
+
+[node name="ActionsPanel" type="PanelContainer" parent="MarginContainer/HSplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 3.0
+theme = ExtResource("1_ds0o7")
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/HSplitContainer/ActionsPanel"]
+layout_mode = 2
+theme = ExtResource("1_ds0o7")
+
+[node name="Label" type="Label" parent="MarginContainer/HSplitContainer/ActionsPanel/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+text = "Actions"
+
+[node name="MessageBox" type="CenterContainer" parent="MarginContainer/HSplitContainer/ActionsPanel"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/HSplitContainer/ActionsPanel/MessageBox"]
+layout_mode = 2
+text = "No Selected Map"
+
+[connection signal="pressed" from="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer/VBoxContainer/HBoxContainer/RefreshButton" to="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer/VBoxContainer/HBoxContainer/RefreshButton" method="_on_pressed"]
