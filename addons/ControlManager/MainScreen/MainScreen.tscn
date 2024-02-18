@@ -9,6 +9,7 @@ extends Control
 
 var loaded_sets : Array[ControlSet] = []
 var selected_set = 0
+var new_var
 
 func _ready():
 	load_sets()
