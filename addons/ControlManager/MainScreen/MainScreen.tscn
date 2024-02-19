@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=3 uid="uid://dnplh0s3bo5g3"]
+[gd_scene load_steps=5 format=3 uid="uid://dnplh0s3bo5g3"]
 
 [ext_resource type="Theme" uid="uid://7te0qtvquq3j" path="res://addons/ControlManager/MainScreen/main_screen_theme.tres" id="1_ds0o7"]
-[ext_resource type="Script" path="res://addons/ControlManager/MainScreen/RefreshButton.gd" id="2_q3lhf"]
+[ext_resource type="Script" path="res://addons/ControlManager/MainScreen/Buttons/RefreshButton.gd" id="2_1abct"]
+[ext_resource type="Script" path="res://addons/ControlManager/MainScreen/Buttons/NewSetButton.gd" id="3_kxd0r"]
 
 [sub_resource type="GDScript" id="GDScript_dy3r5"]
 script/source = "@tool
@@ -9,7 +10,6 @@ extends Control
 
 var loaded_sets : Array[ControlSet] = []
 var selected_set = 0
-var new_var
 
 func _ready():
 	load_sets()
@@ -97,11 +97,27 @@ layout_mode = 2
 size_flags_horizontal = 10
 size_flags_vertical = 4
 text = "Refresh"
-script = ExtResource("2_q3lhf")
+script = ExtResource("2_1abct")
 
 [node name="NewSetButton" type="Button" parent="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer/VBoxContainer"]
 layout_mode = 2
 text = "New Set"
+script = ExtResource("3_kxd0r")
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer/VBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(0, 31)
+layout_mode = 2
+
+[node name="NewSetTextEdit" type="TextEdit" parent="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer/VBoxContainer/HBoxContainer2"]
+custom_minimum_size = Vector2(0, 31)
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "New Set Name"
+
+[node name="Button" type="Button" parent="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+text = "Add"
 
 [node name="SeatPanel" type="PanelContainer" parent="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer"]
 layout_mode = 2
@@ -151,3 +167,4 @@ layout_mode = 2
 text = "No Selected Map"
 
 [connection signal="pressed" from="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer/VBoxContainer/HBoxContainer/RefreshButton" to="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer/VBoxContainer/HBoxContainer/RefreshButton" method="_on_pressed"]
+[connection signal="pressed" from="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer/VBoxContainer/NewSetButton" to="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer/VBoxContainer/NewSetButton" method="_on_pressed"]
