@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="ControlSet" load_steps=2 format=3 uid="uid://b3lwv63pkr6hq"]
+
+[ext_resource type="Script" path="res://addons/ControlManager/Resources/ControlSet.gd" id="1_bn3wk"]
+
+[resource]
+script = ExtResource("1_bn3wk")
+name = "Test"
+seats = Array[Resource("res://addons/ControlManager/Resources/Map.gd")]([])

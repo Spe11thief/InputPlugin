@@ -1,0 +1,22 @@
+[gd_scene load_steps=4 format=3 uid="uid://dlxo1onbe6vsu"]
+
+[ext_resource type="Script" path="res://addons/ControlManager/MainScreen/SetSelectBar.gd" id="1_5of36"]
+[ext_resource type="Script" path="res://addons/ControlManager/MainScreen/Buttons/SetDeleteButton.gd" id="2_3lbji"]
+[ext_resource type="Script" path="res://addons/ControlManager/MainScreen/Buttons/SetSelectButton.gd" id="3_om2jr"]
+
+[node name="SetSelectBar" type="HBoxContainer"]
+script = ExtResource("1_5of36")
+
+[node name="SetDeleteButton" type="Button" parent="."]
+layout_mode = 2
+text = "x"
+script = ExtResource("2_3lbji")
+
+[node name="SetSelectButton" type="Button" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Test"
+script = ExtResource("3_om2jr")
+
+[connection signal="pressed" from="SetDeleteButton" to="SetDeleteButton" method="_on_pressed"]
+[connection signal="pressed" from="SetSelectButton" to="SetSelectButton" method="_on_pressed"]

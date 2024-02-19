@@ -1,34 +1,61 @@
-[gd_scene load_steps=5 format=3 uid="uid://dnplh0s3bo5g3"]
+[gd_scene load_steps=8 format=3 uid="uid://dnplh0s3bo5g3"]
 
 [ext_resource type="Theme" uid="uid://7te0qtvquq3j" path="res://addons/ControlManager/MainScreen/main_screen_theme.tres" id="1_ds0o7"]
 [ext_resource type="Script" path="res://addons/ControlManager/MainScreen/Buttons/RefreshButton.gd" id="2_1abct"]
 [ext_resource type="Script" path="res://addons/ControlManager/MainScreen/Buttons/NewSetButton.gd" id="3_kxd0r"]
+[ext_resource type="Script" path="res://addons/ControlManager/MainScreen/Buttons/CancelNewSetButton.gd" id="4_tr25t"]
+[ext_resource type="Script" path="res://addons/ControlManager/MainScreen/Buttons/AddNewSetButton.gd" id="5_gwg4n"]
+[ext_resource type="Script" path="res://addons/ControlManager/MainScreen/MessageBox.gd" id="6_ua514"]
 
 [sub_resource type="GDScript" id="GDScript_dy3r5"]
 script/source = "@tool
 extends Control
+class_name  MainScreen
 
 var loaded_sets : Array[ControlSet] = []
-var selected_set = 0
+var selected_set: ControlSet:
+	set(new_set):
+		selected_set = new_set
+		print(\"selected set: \" + new_set.name)
+@onready var SET_BUTTON = preload(\"res://addons/ControlManager/MainScreen/SetSelectBar.tscn\")
+@onready var set_container = $MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer/SetContainer
 
 func _ready():
+	print(\"Control Screen is ready\")
 	load_sets()
 
 func load_sets():
+	print(\"loading sets\")
 	loaded_sets.clear()
-	var dir_access := DirAccess.open(\"res://addons/ControlManager/ControlSets/\")
+	for child in set_container.get_children():
+		if child.find_child(\"SetSelectButton\"): child.queue_free()
+	var dir_access := DirAccess.open(\"res://addons/ControlManager/Controls/Sets/\")
 	if dir_access:
-		while dir_access.get_next():
-			if dir_access.get_current_type() is ControlSet:
-				var resource_path = dir_access.get_current_path()
-				var resource = ResourceLoader.load(resource_path)
-				loaded_sets.push_back(resource)
-		print(\"Loaded \" + str(loaded_sets.size()) + \" Control Sets\")
-	if selected_set >= selected_set:
-		selected_set = 0
+		var file_names = dir_access.get_files()
+		for file_name in file_names:
+			print(\"checking a file\")
+			var resource_path = dir_access.get_current_dir() + \"/\" + file_name
+			var resource = ResourceLoader.load(resource_path)
+			if resource is ControlSet: loaded_sets.push_back(resource)
+		print(\"Loaded \" + str(loaded_sets.size()) + \" Control Set(s)\")
+	add_set_buttons()
 
-func _on_refresh_button_pressed():
-	print(\"refresh pressed\")
+func add_set_buttons():
+	for control_set in loaded_sets:
+		print(\"Adding set buttons\")
+		var bar = SET_BUTTON.instantiate()
+		var button = bar.find_child(\"SetSelectButton\")
+		bar.control_set = control_set
+		button.text = control_set.name
+		set_container.add_child(bar)
+		
+func add_seat_buttons():
+	for seat in selected_set.seats:
+		pass
+
+func select_set_by_name(set_name: String):
+	for control_set in loaded_sets:
+		if control_set.name == set_name: selected_set = control_set
 "
 
 [node name="MainScreen" type="Control"]
@@ -79,45 +106,53 @@ theme = ExtResource("1_ds0o7")
 layout_mode = 2
 theme = ExtResource("1_ds0o7")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer"]
+[node name="SetContainer" type="VBoxContainer" parent="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer"]
 layout_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer/SetContainer"]
 layout_mode = 2
 alignment = 1
 
-[node name="Label" type="Label" parent="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="Label" type="Label" parent="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer/SetContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 0
 text = "Sets"
 vertical_alignment = 1
 
-[node name="RefreshButton" type="Button" parent="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="RefreshButton" type="Button" parent="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer/SetContainer/HBoxContainer"]
+custom_minimum_size = Vector2(0, 33)
 layout_mode = 2
 size_flags_horizontal = 10
 size_flags_vertical = 4
 text = "Refresh"
 script = ExtResource("2_1abct")
 
-[node name="NewSetButton" type="Button" parent="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer/VBoxContainer"]
+[node name="NewSetButton" type="Button" parent="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer/SetContainer"]
+custom_minimum_size = Vector2(0, 33)
 layout_mode = 2
 text = "New Set"
 script = ExtResource("3_kxd0r")
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer/VBoxContainer"]
+[node name="AddSetTextEditContainer" type="HBoxContainer" parent="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer/SetContainer"]
 visible = false
 custom_minimum_size = Vector2(0, 31)
 layout_mode = 2
 
-[node name="NewSetTextEdit" type="TextEdit" parent="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer/VBoxContainer/HBoxContainer2"]
-custom_minimum_size = Vector2(0, 31)
+[node name="CancelNewSetButton" type="Button" parent="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer/SetContainer/AddSetTextEditContainer"]
+layout_mode = 2
+text = "x"
+script = ExtResource("4_tr25t")
+
+[node name="NewSetTextEdit" type="TextEdit" parent="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer/SetContainer/AddSetTextEditContainer"]
+custom_minimum_size = Vector2(0, 33)
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "New Set Name"
 
-[node name="Button" type="Button" parent="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer/VBoxContainer/HBoxContainer2"]
+[node name="AddNewSetButton" type="Button" parent="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer/SetContainer/AddSetTextEditContainer"]
 layout_mode = 2
 text = "Add"
+script = ExtResource("5_gwg4n")
 
 [node name="SeatPanel" type="PanelContainer" parent="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer"]
 layout_mode = 2
@@ -130,7 +165,10 @@ theme = ExtResource("1_ds0o7")
 layout_mode = 2
 theme = ExtResource("1_ds0o7")
 
-[node name="Label" type="Label" parent="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SeatPanel/MarginContainer"]
+[node name="SeatContainer" type="VBoxContainer" parent="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SeatPanel/MarginContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SeatPanel/MarginContainer/SeatContainer"]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
@@ -138,6 +176,7 @@ text = "Seats"
 
 [node name="MessageBox" type="CenterContainer" parent="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SeatPanel"]
 layout_mode = 2
+script = ExtResource("6_ua514")
 
 [node name="Label" type="Label" parent="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SeatPanel/MessageBox"]
 layout_mode = 2
@@ -161,10 +200,13 @@ text = "Actions"
 
 [node name="MessageBox" type="CenterContainer" parent="MarginContainer/HSplitContainer/ActionsPanel"]
 layout_mode = 2
+script = ExtResource("6_ua514")
 
 [node name="Label" type="Label" parent="MarginContainer/HSplitContainer/ActionsPanel/MessageBox"]
 layout_mode = 2
 text = "No Selected Map"
 
-[connection signal="pressed" from="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer/VBoxContainer/HBoxContainer/RefreshButton" to="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer/VBoxContainer/HBoxContainer/RefreshButton" method="_on_pressed"]
-[connection signal="pressed" from="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer/VBoxContainer/NewSetButton" to="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer/VBoxContainer/NewSetButton" method="_on_pressed"]
+[connection signal="pressed" from="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer/SetContainer/HBoxContainer/RefreshButton" to="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer/SetContainer/HBoxContainer/RefreshButton" method="_on_pressed"]
+[connection signal="pressed" from="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer/SetContainer/NewSetButton" to="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer/SetContainer/NewSetButton" method="_on_pressed"]
+[connection signal="pressed" from="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer/SetContainer/AddSetTextEditContainer/CancelNewSetButton" to="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer/SetContainer/AddSetTextEditContainer/CancelNewSetButton" method="_on_pressed"]
+[connection signal="pressed" from="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer/SetContainer/AddSetTextEditContainer/AddNewSetButton" to="MarginContainer/HSplitContainer/MetaPanel/MarginContainer/VSplitContainer/SetPanel/MarginContainer/SetContainer/AddSetTextEditContainer/AddNewSetButton" method="_on_pressed"]
